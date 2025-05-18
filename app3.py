@@ -11,12 +11,10 @@ import asyncio
 from yt_dlp import YoutubeDL
 import uuid
 
-# Load environment variables
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 GEMINI = os.getenv("GEMINI_API_KEY")
 
-# Configure Instaloader
 loader = instaloader.Instaloader(
     download_pictures=False,
     download_comments=False,
@@ -42,7 +40,6 @@ async def on_message(message):
 
     content = message.content.strip()
 
-    # Instagram handling
     if content.startswith("https://www.instagram.com/"):
         try:
             await message.edit(suppress = True)
@@ -54,7 +51,6 @@ async def on_message(message):
         media_files = downloadinsta(content)
 
         if media_files:
-            # Send all media in a single message to form a carousel/grid
             discord_files = [discord.File(fp) for fp in media_files]
             await message.reply(files=discord_files, mention_author=True)            
             # Clean up
@@ -82,7 +78,6 @@ async def on_message(message):
             await message.channel.send("No media found or failed to download.", delete_after=3)
         return
 
-    # Twitter (X) handling
     if content.startswith("https://x.com/"):
         video = downloadtwitter(content)
         if video:
@@ -108,10 +103,6 @@ async def on_message(message):
         return
 
 def downloadinsta(url):
-    """
-    Attempt to download a video via yt-dlp first; if that fails or no video, fallback to images via instaloader.
-    Returns a list of file paths or None on failure.
-    """
     os.makedirs("insta", exist_ok=True)
 
     # 1. Try video download with yt-dlp
@@ -188,5 +179,4 @@ def downloadtwitter(url):
         print(f"Download Error: {e}")
         return None
 
-# Run the bot
 bot.run(TOKEN)
